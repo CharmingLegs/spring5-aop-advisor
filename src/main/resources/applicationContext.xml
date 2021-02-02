@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-4.0.xsd
+            http://www.springframework.org/schema/tx
+            http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+    <!-- 数据源 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="user" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+
+    <!-- 配置 SqlSessionFactoryBean -->
+    <bean id="sqlSessionFactoryBean" class="com.baomidou.mybatisplus.spring.MybatisSqlSessionFactoryBean">
+        <!-- 数据源 -->
+        <property name="dataSource" ref="dataSource"></property>
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="mapperLocations" value="classpath:mapper/*.xml"/>
+    </bean>
+
+    <!-- 配置 mybatis 扫描 mapper 接口的路径 -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="cn.fall.thee.charming.legs.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactoryBean"/>
+    </bean>
+
+    <!-- 事务管理器 -->
+    <bean id="dataSourceTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+
+    <!-- 基于注解的事务管理 -->
+    <tx:annotation-driven transaction-manager="dataSourceTransactionManager"/>
+
+    <!-- 注册目标对象 -->
+    <bean id="personService" class="cn.fall.thee.charming.legs.service.impl.PersonServiceImpl"/>
+
+    <bean id="disciplineStatisticService" class="cn.fall.thee.charming.legs.service.impl.DisciplineStatisticServiceImpl"/>
+
+    <!-- 注册切面：通知 -->
+    <bean id="myAfterReturningAdvice" class="cn.fall.thee.charming.legs.advice.MyAfterReturningAdvice"/>
+
+    <!-- 注册切面：顾问 -->
+    <bean id="myAdvisor" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property name="advice" ref="myAfterReturningAdvice"/>
+        <property name="mappedNames" value="insertPerson"/>
+    </bean>
+
+    <bean id="myAdvisor2" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+        <property name="advice" ref="myAfterReturningAdvice"/>
+        <property name="mappedNames" value="avgScore"/>
+    </bean>
+
+    <!-- 注册自动代理生成器 -->
+    <bean class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+        <property name="beanNames" value="disciplineStatisticService"/>
+        <property name="interceptorNames" value="myAdvisor2"/>
+    </bean>
+
+
+</beans>

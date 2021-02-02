@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.fall.thee.charming.legs.mapper.DisciplineMapper">
+
+    <select id="avgScore" resultType="map">
+        SELECT disc_name AS discName, ROUND( AVG( disc_score ), 1 ) AS avgScore
+        FROM discipline
+        GROUP BY disc_name
+        ORDER BY disc_name DESC
+    </select>
+</mapper>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.fall.thee.charming.legs.mapper.PersonMapper">
+
+    <resultMap id="BaseResultMap" type="cn.fall.thee.charming.legs.entity.Hobby">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="hobby_name" property="hobbyName" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+      id, hobby_name
+    </sql>
+
+    <select id="getHobbiesById" resultMap="BaseResultMap">
+      SELECT B.id, B.hobby_name
+      FROM person A
+      INNER JOIN hobby B
+      ON A.id = B.person_id
+      WHERE A.id = #{id, jdbcType=INTEGER}
+    </select>
+</mapper>
