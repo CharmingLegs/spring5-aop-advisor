@@ -10,7 +10,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * <p>
- *
+ *  测试类
  * </p>
  *
  * @author maxingjun
